@@ -1,0 +1,6 @@
+{
+  "body": "{\n    \"lotes\" : [\n      {\n        \"horario_promocao\": \"2021-01-29 16:18:00\"\n      },\n      {\n        \"horario_promocao\": \"2021-01-29 16:28:00\"\n      }\n    ]\n  }",
+  "headers": {
+    "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZCI6IjAiLCJmayI6IjEwMDA5ODkwIiwiaWQiOiIyMDEiLCJpYXQiOjE2MTE5NDcxNjd9.Ifsls9CUa_ESm6mSwIMefJRicxT-689QIjXy7Cq_RBg"
+  }
+}

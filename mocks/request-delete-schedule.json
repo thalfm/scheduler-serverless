@@ -1,0 +1,3 @@
+{
+  "body": "{\n    \"lotes\" : [\n        {\n            \"id_lote\": 1\n        },\n        {\n            \"id_lote\": 2\n        }\n    ]\n}"
+}
