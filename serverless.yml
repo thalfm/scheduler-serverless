@@ -16,8 +16,8 @@ custom:
     dev: sigeco-promocao-api-dev
     prod: sigeco-promocao-api-prod
   endPonitSigecoApi:
-    dev: https://93494173be7a.ngrok.io/
-    prod: https://93494173be7a.ngrok.io/
+    dev: https://feature-gcobo-432-promocao.devops.grancursosonline.com.br
+    prod: https://sigeco-api.grancursosonline.com.br
   memory:
     dev: 2048
     prod: 2048
