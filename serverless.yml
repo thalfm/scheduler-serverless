@@ -1,0 +1,81 @@
+service: sigeco-promocao-serverless
+
+# Para teste local
+plugins:
+  - serverless-localstack
+  - serverless-offline
+
+custom:
+  localstack:
+    stages:
+      - local
+    autostart: false
+  serverless-offline:
+    useChildProcesses: true
+  tags:
+    dev: sigeco-promocao-api-dev
+    prod: sigeco-promocao-api-prod
+  endPonitSigecoApi:
+    dev: https://93494173be7a.ngrok.io/
+    prod: https://93494173be7a.ngrok.io/
+  memory:
+    dev: 2048
+    prod: 2048
+  secrets: ${ssm:/aws/reference/secretsmanager/USUARIO_SIGEGO-${self:provider.stage}~true}
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  stage: ${opt:stage, "dev"}
+  environment:
+    APP_ENV: ${self:provider.stage}
+    URL_API_SIGECO: ${self:custom.endPonitSigecoApi.${self:provider.stage}}
+    USER_SIGECO: ${self:custom.secrets.USER_SIGECO}
+    PWD_USER_SIGECO: ${self:custom.secrets.PWD_USER_SIGECO}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - events:PutRule
+        - events:PutTargets
+        - events:DeleteRule
+        - events:RemoveTargets
+        - lambda:AddPermission
+      Resource: "*"
+      
+functions:
+  SchedulePromotion:
+    handler: src/handlers/scheduler/schedule_promotion_handler.main
+    events:
+      - http:
+          path: agendar-promocao
+          method: post
+    memorySize: ${self:custom.memory.${self:provider.stage}}
+  DeleteSchedulePromotion:
+    handler: src/handlers/scheduler/delete_schedule_promotion_handler.main
+    events:
+      - http:
+          path: agendar-promocao
+          method: delete
+    memorySize: ${self:custom.memory.${self:provider.stage}}
+  PromotionActivator:
+    handler: src/handlers/activator/promotion_activator_handler.main
+    memorySize: ${self:custom.memory.${self:provider.stage}}
+
+resources:
+  Resources:
+    PermissionToCallPromotionActivator:
+      Type: "AWS::Lambda::Permission"
+      Properties: 
+        Action: lambda:InvokeFunction
+        FunctionName: 
+          Ref: PromotionActivatorLambdaFunction
+        Principal: "events.amazonaws.com"
+  Outputs:
+    PromotionActivatorArn:
+      Value:
+        Fn::GetAtt: 
+          - PromotionActivatorLambdaFunction
+          - Arn
+      Export:
+        Name: PromotionActivatorArn-${self:provider.stage}
