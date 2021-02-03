@@ -1,0 +1,30 @@
+{
+  "name": "promocao-assinatura-serverless",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "start": "npx nodemon --exec npm run offline",
+    "offline": "npx sls offline start --host 0.0.0.0 --stage dev",
+    "schedule-invoke-local": "USER_SIGECO=''  PWD_USER_SIGECO='' npx sls invoke local -f SchedulePromotion --path mocks/request-schedule.json",
+    "activator-invoke-local": "USER_SIGECO=''  PWD_USER_SIGECO='' npx sls invoke local -f PromotionActivator",
+    "delete-schedule-invoke-local": "USER_SIGECO=''  PWD_USER_SIGECO='' npx sls invoke local -f DeleteSchedulePromotion --path mocks/request-delete-schedule.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.2",
+    "serverless": "^1.67.0",
+    "serverless-localstack": "^0.4.24",
+    "serverless-mocha-plugin": "^1.12.0",
+    "serverless-offline": "^6.1.4"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.653.0",
+    "axios": "^0.21.1",
+    "csvtojson": "^2.0.10",
+    "env-var": "^7.0.0",
+    "moment": "^2.29.1"
+  }
+}

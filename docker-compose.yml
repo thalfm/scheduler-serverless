@@ -1,0 +1,43 @@
+version: '2.1'
+
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack-full
+    network_mode: bridge
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+      - "${PORT_WEB_UI-8081}:${PORT_WEB_UI-8080}"
+    environment:
+      - SERVICES=${SERVICES- }
+      - DEBUG=${DEBUG- }
+      - DATA_DIR=${DATA_DIR- }
+      - PORT_WEB_UI=${PORT_WEB_UI- }
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR- }
+      - KINESIS_ERROR_PROBABILITY=${KINESIS_ERROR_PROBABILITY- }
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=${TMPDIR}
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  app:
+    build: .
+    container_name: 'promocao-sls'
+    volumes:
+        - .:/src
+        - nodemodules:/src/node_modules
+    restart: on-failure
+    ports:
+        - 3000:3000
+        - 3002:3002
+    links:
+        - localstack
+    depends_on: 
+        - localstack
+    environment: 
+        LOCALSTACK_HOST: localstack
+
+volumes:
+    nodemodules: {}
