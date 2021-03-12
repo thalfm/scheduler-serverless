@@ -74,7 +74,7 @@ const _createCronAwsByMoment = (date) => {
 }
 /** ${stage}_promocao_lote_{id_lote}*/
 const _createRuleName = (lote) => {
-    return `${settings.APP_ENV}_promocao_lote_${lote.id_lote}`
+    return `promocao_lote_${lote.id_lote}_${settings.APP_ENV}`
 }
 
 const _getAccount = async () => {
