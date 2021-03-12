@@ -44,4 +44,4 @@ O Projeto é modularizado de tal forma que facilita a inserção e a manutençã
 
 ### Arquivos
 
-- `serveless.yml`: Este arquivo é responsável pelo deploy dos handlers no lambda da AWS. Cada handler terá uma configuração específica. Se um handler for criado deverá ser criado uma nova função aqui com as respectivas configurações.
+- [serverless.yml](https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml/): Este arquivo é responsável pelo deploy dos handlers no lambda da AWS. Cada handler terá uma configuração específica. Se um handler for criado deverá ser criado uma nova função aqui com as respectivas configurações.
