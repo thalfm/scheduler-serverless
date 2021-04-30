@@ -1,0 +1,56 @@
+image: nikolaik/python-nodejs:python3.8-nodejs14-slim
+options:
+  docker: true
+
+definitions:
+  steps: &build-dependencies
+    - step:
+        name: Build Node Dependencies
+        caches:
+          - node
+        script:
+          - npm install
+        artifacts:
+          - node_modules/**
+    - step:
+        name: Build Python Dependencies
+        caches:
+          - pip
+        script:
+          - virtualenv -p python3.8 --always-copy venv
+          - source venv/bin/activate
+          - pip install python-dotenv
+        artifacts:
+          - venv/**
+
+  deploy: &serverless-deploy
+    script:
+      - source venv/bin/activate
+      - | 
+          python -c "
+          from dotenv import dotenv_values;
+          config=dotenv_values('.env.example'); import os;
+          config_updated={key: os.environ[key] for key in config.keys()};
+          f=open('.env', mode='w');
+          [f.write(\"%s=%s\n\" % (k,v)) for k, v in config_updated.items()]"
+          
+      - export SLS=./node_modules/serverless/bin/serverless.js
+      - $SLS config credentials --provider aws --key $AWS_LAMBDA_ACCESS_KEY --secret $AWS_LAMBDA_SECRET_KEY
+      - $SLS deploy --stage $APP_ENV --region $AWS_LAMBDA_REGION --verbose
+      - $SLS info --stage $APP_ENV
+
+pipelines:
+  branches:
+    develop:
+      - parallel: *build-dependencies
+      - step:
+          <<: *serverless-deploy
+          name: Deploy Development
+          deployment: Development
+
+    master:
+      - parallel: *build-dependencies
+      - step:
+          <<: *serverless-deploy
+          name: Deploy Production
+          deployment: Production
