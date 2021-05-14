@@ -47,13 +47,13 @@ provider:
   lambdaHashingVersion: "20201221"
   iam:
     role: ${env:AWS_LAMBDA_ROLE, "dev"}
-  vpc:
-    securityGroupIds:
-      - ${self:custom.securityGroupsIds.${opt:stage}}
-    subnetIds:
-      - ${self:custom.subnetIds.${opt:stage}.sub1}
-      - ${self:custom.subnetIds.${opt:stage}.sub2}
-      - ${self:custom.subnetIds.${opt:stage}.sub3}
+#  vpc:
+#    securityGroupIds:
+#      - ${self:custom.securityGroupsIds.${opt:stage}}
+#    subnetIds:
+#      - ${self:custom.subnetIds.${opt:stage}.sub1}
+#      - ${self:custom.subnetIds.${opt:stage}.sub2}
+#      - ${self:custom.subnetIds.${opt:stage}.sub3}
 
 plugins:
   - serverless-dotenv-plugin
@@ -83,16 +83,16 @@ custom:
   serverless-offline:
     useChildProcesses: true
 
-  securityGroupsIds:
-    dev: ${env:AWS_LAMBDA_SG_DEV_ID, "dev"}
-    prd: ${env:AWS_LAMBDA_SG_PRD_ID, "dev"}
-
-  subnetIds:
-    dev:
-      sub1: ${env:AWS_LAMBDA_SUBNET_DEV_1, "dev"}
-      sub2: ${env:AWS_LAMBDA_SUBNET_DEV_2, "dev"}
-      sub3: ${env:AWS_LAMBDA_SUBNET_DEV_3, "dev"}
-    prd:
-      sub1: ${env:AWS_LAMBDA_SUBNET_PRD_1, "prd"}
-      sub2: ${env:AWS_LAMBDA_SUBNET_PRD_2, "prd"}
-      sub3: ${env:AWS_LAMBDA_SUBNET_PRD_3, "prd"}
+#  securityGroupsIds:
+#    dev: ${env:AWS_LAMBDA_SG_DEV_ID, "dev"}
+#    prd: ${env:AWS_LAMBDA_SG_PRD_ID, "dev"}
+#
+#  subnetIds:
+#    dev:
+#      sub1: ${env:AWS_LAMBDA_SUBNET_DEV_1, "dev"}
+#      sub2: ${env:AWS_LAMBDA_SUBNET_DEV_2, "dev"}
+#      sub3: ${env:AWS_LAMBDA_SUBNET_DEV_3, "dev"}
+#    prd:
+#      sub1: ${env:AWS_LAMBDA_SUBNET_PRD_1, "prd"}
+#      sub2: ${env:AWS_LAMBDA_SUBNET_PRD_2, "prd"}
+#      sub3: ${env:AWS_LAMBDA_SUBNET_PRD_3, "prd"}
