@@ -1,78 +1,98 @@
-service: sigeco-promocao-serverless
+######################################
+###                                ###
+###        FUNCTIONS BLOCK         ###
+###                                ###
+######################################
 
-# Para teste local
-plugins:
-  - serverless-localstack
-  - serverless-offline
-  - serverless-pseudo-parameters
-custom:
-  localstack:
-    stages:
-      - local
-    autostart: false
-  serverless-offline:
-    useChildProcesses: true
-  tags:
-    dev: sigeco-promocao-api-dev
-    prod: sigeco-promocao-api-prod
-  endPonitSigecoApi:
-    dev: https://feature-gcobo-432-promocao.devops.grancursosonline.com.br
-    prod: https://sigeco-api.grancursosonline.com.br
-  memory:
-    dev: 2048
-    prod: 2048
-  secrets: ${ssm:/aws/reference/secretsmanager/USUARIO_SIGEGO-${self:provider.stage}~true}
-
-provider:
-  name: aws
-  runtime: nodejs12.x
-  region: us-east-1
-  stage: ${opt:stage, "dev"}
-  lambdaHashingVersion: 20201221
-  apiGateway:
-    shouldStartNameWithService: true
-  environment:
-    APP_ENV: ${self:provider.stage}
-    URL_API_SIGECO: ${self:custom.endPonitSigecoApi.${self:provider.stage}}
-    USER_SIGECO: ${self:custom.secrets.USER_SIGECO}
-    PWD_USER_SIGECO: ${self:custom.secrets.PWD_USER_SIGECO}
-      
 functions:
+
   SchedulePromotion:
-    role: arn:aws:iam::#{AWS::AccountId}:role/SchedulePromotionRole
+    name: ${self:service}-schedule-promotion-${opt:stage}
     handler: src/handlers/scheduler/schedule_promotion_handler.main
     events:
       - http:
           path: agendar-promocao
           method: post
-    memorySize: ${self:custom.memory.${self:provider.stage}}
+    memorySize: ${env:APP_MEMORY_SIZE}
+
   DeleteSchedulePromotion:
-    role: arn:aws:iam::#{AWS::AccountId}:role/DeleteSchedulePromotionRole
+    name: ${self:service}-delete-schedule-promotion-${opt:stage}
     handler: src/handlers/scheduler/delete_schedule_promotion_handler.main
     events:
       - http:
           path: agendar-promocao
           method: delete
-    memorySize: ${self:custom.memory.${self:provider.stage}}
-  PromotionActivator:
-    role: arn:aws:iam::#{AWS::AccountId}:role/PromotionActivatorRole
-    handler: src/handlers/activator/promotion_activator_handler.main
-    memorySize: ${self:custom.memory.${self:provider.stage}}
+    memorySize: ${env:APP_MEMORY_SIZE}
 
-resources:
-  Resources:
-    PermissionToCallPromotionActivator:
-      Type: "AWS::Lambda::Permission"
-      Properties: 
-        Action: lambda:InvokeFunction
-        FunctionName: 
-          Ref: PromotionActivatorLambdaFunction
-        Principal: "events.amazonaws.com"
-  Outputs:
-    PromotionActivatorArn:
-      Value:
-        Fn::GetAtt: 
-          - PromotionActivatorLambdaFunction
-          - Arn
-      Export:
-        Name: PromotionActivatorArn-${self:provider.stage}
+  PromotionActivator:
+    name: ${self:service}-promotion-activator-${opt:stage}
+    handler: src/handlers/activator/promotion_activator_handler.main
+    memorySize: ${env:APP_MEMORY_SIZE}
+
+######################################
+###                                ###
+###       FRAMEWORK SETTINGS       ###
+###                                ###
+######################################
+
+useDotenv: true
+service: ${env:APP_SERVICE_NAME}
+variablesResolutionMode: "20210326"
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ${env:AWS_LAMBDA_REGION, "sa-east-1"}
+  lambdaHashingVersion: "20201221"
+  iam:
+    role: ${env:AWS_LAMBDA_ROLE, "dev"}
+  vpc:
+    securityGroupIds:
+      - ${self:custom.securityGroupsIds.${opt:stage}}
+    subnetIds:
+      - ${self:custom.subnetIds.${opt:stage}.sub1}
+      - ${self:custom.subnetIds.${opt:stage}.sub2}
+      - ${self:custom.subnetIds.${opt:stage}.sub3}
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-localstack
+  - serverless-offline
+  - serverless-pseudo-parameters
+
+package:
+  patterns:
+    - '!.git/**'
+    - '!venv/**'
+    - '!node_modules/**'
+    - '!.vscode/**'
+    - '!bitbucket-pipelines.yml'
+    - '!package-lock.json'
+    - '!package.json'
+    - '!README.md'
+    - '!requirements.txt'
+  excludeDevDependencies: false
+
+custom:
+  localstack:
+    stages:
+      - local
+    autostart: false
+
+  serverless-offline:
+    useChildProcesses: true
+
+  securityGroupsIds:
+    dev: ${env:AWS_LAMBDA_SG_DEV_ID, "dev"}
+    prd: ${env:AWS_LAMBDA_SG_PRD_ID, "dev"}
+
+  subnetIds:
+    dev:
+      sub1: ${env:AWS_LAMBDA_SUBNET_DEV_1, "dev"}
+      sub2: ${env:AWS_LAMBDA_SUBNET_DEV_2, "dev"}
+      sub3: ${env:AWS_LAMBDA_SUBNET_DEV_3, "dev"}
+    prd:
+      sub1: ${env:AWS_LAMBDA_SUBNET_PRD_1, "prd"}
+      sub2: ${env:AWS_LAMBDA_SUBNET_PRD_2, "prd"}
+      sub3: ${env:AWS_LAMBDA_SUBNET_PRD_3, "prd"}
