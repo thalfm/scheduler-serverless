@@ -1,12 +1,13 @@
 const moment = require('moment')
 const {createRule, createTargets} = require("../common");
+const settings = require('../../config/settings')
 
 const createSchedulers = async (lotesToSchedule) => {
 
     let schedulers = [];
 
     for (const [_, lote] of lotesToSchedule.lotes.entries()) {
-        let date = new moment(lote.horario_promocao).add(3, 'h')
+        let date = new moment(lote.horario_promocao).add(settings.DIFERENCA_HORAS_DO_BRASIL, 'h')
         let params = await createRule(lote, date)
 
         await createTargets(lote)

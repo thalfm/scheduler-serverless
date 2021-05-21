@@ -5,6 +5,7 @@ const settings = {
     AWS_REGION: env.get('AWS_REGION').required().asString(),
     USER_SIGECO: env.get('USER_SIGECO').asString(),
     PWD_USER_SIGECO: env.get('PWD_USER_SIGECO').asString(),
+    DIFERENCA_HORAS_DO_BRASIL: env.get('DIFERENCA_HORAS_DO_BRASIL').asString(),
 }
 
 module.exports = settings
