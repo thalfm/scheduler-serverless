@@ -43,7 +43,7 @@ const createTargets = async (lote) => {
         Targets: [
             {
                 Id: 'default',
-                Arn: `arn:aws:lambda:${settings.AWS_REGION}:${account}:function:sigeco-promocao-serverless-${settings.APP_ENV}-PromotionActivator`,
+                Arn: `arn:aws:lambda:${settings.AWS_REGION}:${account}:function:sigeco-promocao-serverless-promotion-activator-${settings.APP_ENV}`,
                 Input: JSON.stringify(lote)
             }
         ]
