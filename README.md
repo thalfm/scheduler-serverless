@@ -1,4 +1,4 @@
-# ggeducacional/sigeco-promocao-serverless
+# scheduler-serverless
 
 ### Tecnologias utilizadas
 
